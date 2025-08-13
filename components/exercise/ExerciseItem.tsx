@@ -83,9 +83,7 @@ const ExerciseItem: React.FC<ExerciseItemProps> = ({ docId, exercise, index, isF
                         )}
                         {exercise.title && (
                             <p className="font-semibold text-base text-indigo-600 dark:text-indigo-400 italic">
-                                <MathJax hideUntilTypeset="first" inline key={exercise.title}>
-                                    {exercise.title}
-                                </MathJax>
+                                <MathRenderer content={exercise.title} />
                             </p>
                         )}
                     </div>
