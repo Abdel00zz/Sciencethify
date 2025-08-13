@@ -99,25 +99,83 @@ const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
 
   const handlePrint = useCallback(() => {
     setIsPrinting(true);
-    const printHtml = generateHtmlForPrint(document, settings, options);
-    const blob = new Blob([printHtml], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
     
-    const printWindow = window.open(url, '_blank');
-    if (!printWindow) {
-      addToast("Could not open print window. Please disable pop-up blockers.", 'error');
-      setIsPrinting(false);
-      URL.revokeObjectURL(url);
-      return;
-    }
-    const timer = setInterval(() => {
-      if (printWindow.closed) {
-        clearInterval(timer);
-        setIsPrinting(false);
-        URL.revokeObjectURL(url);
+    try {
+      const printHtml = generateHtmlForPrint(document, settings, options);
+      
+      // Sur mobile, utiliser une approche différente
+      if (isMobile) {
+        // Créer un iframe temporaire pour l'impression mobile
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.left = '-9999px';
+        iframe.style.width = '1px';
+        iframe.style.height = '1px';
+        document.body.appendChild(iframe);
+        
+        iframe.onload = () => {
+          try {
+            const iframeWindow = iframe.contentWindow;
+            if (iframeWindow) {
+              // Attendre que MathJax soit chargé avant d'imprimer
+              setTimeout(() => {
+                try {
+                  iframeWindow.print();
+                } catch (printError) {
+                  console.error('Erreur d\'impression mobile:', printError);
+                  addToast(t('modals.export.printErrorMobile'), 'error');
+                }
+                document.body.removeChild(iframe);
+                setIsPrinting(false);
+              }, 2000);
+            }
+          } catch (error) {
+            console.error('Erreur lors de la préparation de l\'impression mobile:', error);
+            addToast(t('modals.export.printErrorMobile'), 'error');
+            document.body.removeChild(iframe);
+            setIsPrinting(false);
+          }
+        };
+        
+        iframe.onerror = () => {
+          addToast(t('modals.export.printErrorMobile'), 'error');
+          document.body.removeChild(iframe);
+          setIsPrinting(false);
+        };
+        
+        const iframeDoc = iframe.contentDocument;
+        if (iframeDoc) {
+          iframeDoc.open();
+          iframeDoc.write(printHtml);
+          iframeDoc.close();
+        }
+      } else {
+        // Approche desktop classique
+        const blob = new Blob([printHtml], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        
+        const printWindow = window.open(url, '_blank');
+        if (!printWindow) {
+          addToast(t('modals.export.printError'), 'error');
+          setIsPrinting(false);
+          URL.revokeObjectURL(url);
+          return;
+        }
+        
+        const timer = setInterval(() => {
+          if (printWindow.closed) {
+            clearInterval(timer);
+            setIsPrinting(false);
+            URL.revokeObjectURL(url);
+          }
+        }, 500);
       }
-    }, 500);
-  }, [document, settings, options, addToast]);
+    } catch (error) {
+      console.error('Erreur lors de la génération du contenu d\'impression:', error);
+      addToast(t('modals.export.printError'), 'error');
+      setIsPrinting(false);
+    }
+  }, [document, settings, options, addToast, isMobile, t]);
   
   const handleIframeLoad = () => {
     setIsLoadingPreview(false);

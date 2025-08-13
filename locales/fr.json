@@ -63,7 +63,9 @@
       "showDifficulty": "Afficher la difficulté",
       "showKeywords": "Afficher les mots-clés",
       "showTitles": "Afficher les titres",
-      "print": "Imprimer"
+      "print": "Imprimer",
+      "printError": "Impossible d'ouvrir la fenêtre d'impression. Veuillez désactiver les bloqueurs de pop-up.",
+      "printErrorMobile": "Problème survenu lors de l'impression. Veuillez réessayer ou utiliser un autre navigateur."
     },
     "settings": {
       "title": "Paramètres",

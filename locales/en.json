@@ -63,7 +63,9 @@
       "showDifficulty": "Show difficulty",
       "showKeywords": "Show keywords",
       "showTitles": "Show titles",
-      "print": "Print"
+      "print": "Print",
+      "printError": "Could not open print window. Please disable pop-up blockers.",
+      "printErrorMobile": "A problem occurred during printing. Please try again or use another browser."
     },
     "settings": {
       "title": "Settings",
