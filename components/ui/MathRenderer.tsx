@@ -53,8 +53,77 @@ const MathRenderer: React.FC<MathRendererProps> = ({ content, className }) => {
         onTypeset={onDone}
         style={{ opacity: isTypesetting ? 0 : 1, transition: 'opacity 0.2s ease-in' }}
       >
-        <div dangerouslySetInnerHTML={{ __html: content }} />
+        <div 
+          dangerouslySetInnerHTML={{ __html: content }} 
+          className="modern-lists"
+        />
       </MathJax>
+      <style jsx>{`
+        .modern-lists ol {
+          list-style: none;
+          padding-left: 0;
+          counter-reset: level1;
+        }
+        .modern-lists li {
+          list-style: none;
+          position: relative;
+          padding-left: 2.5em;
+          margin-bottom: 0.75em;
+          counter-increment: level1;
+        }
+        .modern-lists li::before {
+          content: counter(level1);
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 1.8em;
+          height: 1.8em;
+          line-height: 1.8em;
+          text-align: center;
+          border-radius: 50%;
+          background-color: #e0e7ff;
+          color: #4338ca;
+          font-weight: 600;
+          font-size: 0.8rem;
+        }
+        .modern-lists ol ol {
+          counter-reset: level2;
+          margin-top: 0.5em;
+        }
+        .modern-lists ol ol > li {
+          counter-increment: level2;
+        }
+        .modern-lists ol ol > li::before {
+          content: counter(level1) "." counter(level2);
+          background-color: #f0f9ff;
+          color: #0284c7;
+        }
+        .modern-lists ol ol ol {
+          counter-reset: level3;
+        }
+        .modern-lists ol ol ol > li {
+          counter-increment: level3;
+        }
+        .modern-lists ol ol ol > li::before {
+          content: counter(level1) "." counter(level2) "." counter(level3);
+          background-color: #f1f5f9;
+          color: #64748b;
+          font-size: 0.7rem;
+        }
+
+        :global(.dark) .modern-lists li::before {
+            background-color: #3730a3;
+            color: #e0e7ff;
+        }
+        :global(.dark) .modern-lists ol ol > li::before {
+            background-color: #075985;
+            color: #f0f9ff;
+        }
+        :global(.dark) .modern-lists ol ol ol > li::before {
+            background-color: #475569;
+            color: #f1f5f9;
+        }
+      `}</style>
     </div>
   );
 };

@@ -25,18 +25,7 @@ const MATHJAX_SCRIPT = `
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 `;
 
-const AUTOPRINT_SCRIPT = `
-<script>
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      window.print();
-    }, 1000);
-  });
-  window.addEventListener('afterprint', () => {
-    window.close();
-  });
-</script>
-`;
+
 
 
 const getStyles = (options: ExportOptions) => {
@@ -124,21 +113,8 @@ const getStyles = (options: ExportOptions) => {
       .exercise:first-child { padding-top: 0; }
       
       .exercise:not(:first-child) {
-        padding-top: 2rem;
-        margin-top: 2rem;
-        position: relative;
-      }
-
-      .exercise:not(:first-child)::before {
-        content: '∗ ∗ ∗';
-        position: absolute;
-        top: 0.5rem;
-        left: 50%;
-        transform: translateX(-50%);
-        color: #94a3b8;
-        font-size: 1.2em;
-        font-weight: 400;
-        letter-spacing: 0.5em;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
       }
       
       .exercise-header {
@@ -184,49 +160,89 @@ const getStyles = (options: ExportOptions) => {
       .exercise-content ol > li {
         display: block;
         position: relative;
-        padding-left: 2.2em; /* Provide space for the marker */
-        margin-bottom: 0.5em;
-        font-size: 0.95em; /* Reduce font size as requested */
+        padding-left: 2.5em;
+        margin-bottom: 0.6em;
       }
       .exercise-content ol > li > p:first-child { display: inline; }
-      
-      /* Level 1: 1., 2., etc. */
+
+      /* Level 1: 1, 2, etc. in a dark circle */
       .exercise-content ol > li::before {
-        content: counter(item) ".";
+        content: counter(item);
         counter-increment: item;
         position: absolute;
         left: 0;
         top: 0;
-        width: 1.7em; /* Allocate space for double-digit numbers */
-        text-align: right;
+        width: 1.8em;
+        height: 1.8em;
+        line-height: 1.8em;
+        text-align: center;
+        border-radius: 50%;
+        background-color: #2d3748; /* Dark gray-blue */
+        color: white;
         font-weight: 600;
-        color: #1f2937;
+        font-size: 0.85em;
       }
-      
-      /* Level 2: a), b), etc. */
+
+      /* Level 2: a, b, etc. in a light circle */
       .exercise-content ol ol {
         counter-reset: subitem;
-        margin-top: 0.5em;
+        margin-top: 0.6em;
         padding-left: 0;
       }
-      .exercise-content ol ol > li::before {
-        content: counter(subitem, lower-alpha) ")";
-        counter-increment: subitem;
-        font-weight: normal;
-        color: #4b5563;
+      .exercise-content ol ol > li {
+        padding-left: 2.5em;
+        margin-bottom: 0.5em;
       }
-      
-      /* Level 3: i., ii., etc. */
+      .exercise-content ol ol > li::before {
+        content: counter(subitem, lower-alpha);
+        counter-increment: subitem;
+        background-color: #e2e8f0; /* Light gray */
+        color: #2d3748; /* Dark gray-blue */
+        font-weight: 600;
+      }
+
+      /* Level 3: i, ii, etc. with a simple marker */
       .exercise-content ol ol ol {
         counter-reset: subsubitem;
         padding-left: 0;
       }
+      .exercise-content ol ol ol > li {
+        padding-left: 3em;
+        margin-bottom: 0.4em;
+      }
       .exercise-content ol ol ol > li::before {
         content: counter(subsubitem, lower-roman) ".";
         counter-increment: subsubitem;
+        background-color: transparent;
+        color: #4a5568;
+        font-weight: normal;
+        width: auto;
+        height: auto;
+        line-height: inherit;
+        text-align: left;
+        left: 0.5em;
       }
 
+
+      .print-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        z-index: 100;
+      }
+      .print-button svg {
+        width: 24px;
+        height: 24px;
+        fill: #333;
+      }
       @media print {
+        .print-button {
+          display: none;
+        }
         body { padding: 0; background-color: #ffffff !important; font-weight: normal !important; }
         .page {
           margin: 0;
@@ -312,8 +328,7 @@ export const generateHtmlForPrint = (
   options: ExportOptions
 ): string => {
     const content = generateHtmlForExport(doc, settings, options);
-    // Inject print-specific script and class
+    // Inject print button and class
     return content
-        .replace('</body>', `${AUTOPRINT_SCRIPT}</body>`)
-        .replace('<body oncontextmenu="return false;">', '<body class="print-mode" oncontextmenu="return false;">');
+        .replace('<body oncontextmenu="return false;">', '<body class="print-mode" oncontextmenu="return false;"><button class="print-button" onclick="window.print()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg></button>');
 }
