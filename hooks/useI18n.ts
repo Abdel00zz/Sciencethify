@@ -100,7 +100,9 @@ const enTranslations = {
       "aiText": "Use the 'Add from Image' button to let our AI analyze and transcribe your exercises automatically. In the upload window, you can choose to have the AI bold key terms for you.",
       "about": "About Mathify",
       "aboutText": "Mathify is an innovative educational platform for math teachers and students. It uses AI to analyze images of math exercises, automatically extracting content, structure, and LaTeX formulas to streamline the creation of structured mathematical documents.",
-      "contact": "Contact & Support"
+      "contact": "Contact & Support",
+      "creditsTitle": "Credits",
+      "creditsText": "Crafted with ❤️ and ☕ by Boudouh Abdelmalek in Morocco 🇲🇦. You can reach me at bdh.malek@gmail.com."
     },
     "confirm": {
       "title": "Are you sure?",
@@ -247,7 +249,9 @@ const frTranslations = {
       "aiText": "Utilisez le bouton 'Ajouter depuis une image' pour que notre IA analyse et transcrive automatiquement vos exercices. Dans la fenêtre d'import, vous pouvez choisir que l'IA mette les mots-clés en gras pour vous.",
       "about": "À propos de Mathify",
       "aboutText": "Mathify est une plateforme éducative innovante pour les enseignants et étudiants en mathématiques. Elle utilise l'IA pour analyser des images d'exercices, extrayant automatiquement le contenu, la structure et les formules LaTeX pour faciliter la création de documents mathématiques.",
-      "contact": "Contact & Support"
+      "contact": "Contact & Support",
+      "creditsTitle": "Crédits",
+      "creditsText": "Créé avec ❤️ et ☕ par Boudouh Abdelmalek au Maroc 🇲🇦. Vous pouvez me contacter à bdh.malek@gmail.com."
     },
     "confirm": {
       "title": "Êtes-vous sûr ?",

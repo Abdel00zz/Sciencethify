@@ -8,7 +8,7 @@ import ConfirmModal from '../modals/ConfirmModal';
 import NewDocumentModal from '../modals/NewDocumentModal';
 import { Link } from 'react-router-dom';
 import Tooltip from '../ui/Tooltip';
-import { MoreVertical, Pencil, Copy, Trash2, FileJson2, FileText, Book, Calendar } from 'lucide-react';
+import { Book, Calendar, Copy, FileJson2, ListOrdered, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 
 interface DocumentCardProps {
@@ -63,49 +63,43 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, isRecent = false 
     setActionsOpen(false);
   };
   
-  const highlightClass = isRecent ? 'bg-indigo-50 dark:bg-indigo-900/10' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50';
+  const highlightClass = isRecent 
+    ? 'bg-indigo-50 dark:bg-slate-800 border-indigo-500/50' 
+    : 'bg-white dark:bg-slate-800/50 border-transparent';
 
   return (
     <>
-      <li className={`relative transition-colors duration-200 ${highlightClass}`}>
-        <Link to={`/document/${document.id}`} className="block">
-          <div className="flex items-center p-5 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors duration-200 rounded-xl">
-            <div className="flex-shrink-0 mr-5">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-100 to-indigo-200 dark:from-indigo-900/50 dark:to-indigo-800/50 flex items-center justify-center shadow-sm">
-                <FileText className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-              </div>
-            </div>
+      <li className={`relative group transition-all duration-300 ease-in-out`}>
+        <Link to={`/document/${document.id}`} className="block p-1">
+          <div className={`relative flex flex-col h-full p-4 rounded-xl border transition-all duration-300 ease-in-out shadow-sm hover:shadow-lg hover:-translate-y-1 dark:shadow-slate-900/50 ${highlightClass}`}>
             <div className="flex-grow">
-              <p className="text-lg font-bold text-gray-900 dark:text-gray-100 truncate mb-1">{document.title}</p>
-              <div className="flex items-center gap-5 text-sm text-gray-500 dark:text-gray-400">
-                <div className="flex items-center gap-2"><Book size={16} className="text-indigo-500" /><span className="font-medium">{document.className}</span></div>
-                <div className="flex items-center gap-2"><Calendar size={16} className="text-indigo-500" /><span className="font-medium">{document.schoolYear}</span></div>
-              </div>
+                <p className="text-base font-bold text-slate-800 dark:text-slate-100 truncate">{document.title}</p>
             </div>
-            <div className="hidden md:flex flex-shrink-0 items-center gap-8 ml-8 mr-6 text-sm">
-               <div className="text-center">
-                 <p className="font-bold text-lg text-indigo-600 dark:text-indigo-400">{document.exercises.length}</p>
-                 <p className="text-gray-500 dark:text-gray-400 text-xs">{t('dashboard.documentCard.exercises')}</p>
-               </div>
-               <div className="text-right">
-                 <p className="text-gray-600 dark:text-gray-300 font-medium">{t('dashboard.documentCard.lastModified')}</p>
-                 <p className="text-gray-500 dark:text-gray-400 text-xs">{lastModified.toLocaleDateString(settings.language)}</p>
-               </div>
+            
+            <div className="flex justify-between items-center mt-3 text-xs text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-4 whitespace-nowrap">
+                    <div className="flex items-center gap-1.5"><Book size={12} /><span className="font-medium">{document.className}</span></div>
+                    <div className="flex items-center gap-1.5"><Calendar size={12} /><span className="font-medium">{document.schoolYear}</span></div>
+                    <div className="flex items-center gap-1.5"><ListOrdered size={12} /><span className="font-medium">{document.exercises.length} {t('dashboard.documentCard.exercises')}</span></div>
+                </div>
+                <div className="text-slate-400 dark:text-slate-500 font-medium">
+                    <span>{lastModified.toLocaleDateString(settings.language)}</span>
+                </div>
             </div>
           </div>
         </Link>
-        <div ref={actionsRef} className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex-shrink-0" onClick={e => e.stopPropagation()}>
+        <div ref={actionsRef} className="absolute right-2 top-2 z-10 flex-shrink-0" onClick={e => e.stopPropagation()}>
             <Tooltip text={t('tooltips.actions')}>
-                <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setActionsOpen(c => !c)}>
+                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => setActionsOpen(c => !c)}>
                     <MoreVertical size={20} />
                 </Button>
             </Tooltip>
             {isActionsOpen && (
-            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-900 rounded-xl shadow-lg z-20 border border-gray-200 dark:border-gray-800 p-2 space-y-1 animate-scale-in origin-top-right">
+            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg z-20 border border-slate-200 dark:border-slate-700 p-2 space-y-1 animate-scale-in origin-top-right">
                 <DocumentCardAction onClick={(e) => handleAction(e, () => setEditModalOpen(true))} icon={<Pencil size={16} />} label={t('actions.edit')} />
                 <DocumentCardAction onClick={(e) => handleAction(e, () => duplicateDocument(document.id))} icon={<Copy size={16} />} label={t('actions.duplicate')} />
                 <DocumentCardAction onClick={handleExportJson} icon={<FileJson2 size={16} />} label={t('actions.exportJson')} />
-                <div className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
+                <div className="my-1 h-px bg-slate-200 dark:bg-slate-700" />
                 <DocumentCardAction onClick={(e) => handleAction(e, () => setDeleteModalOpen(true))} icon={<Trash2 size={16} />} label={t('actions.delete')} className="text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-400" />
             </div>
             )}

@@ -57,9 +57,20 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
             <p>{t('modals.help.aboutText')}</p>
         </HelpSection>
 
-        <HelpSection icon={<Mail size={24} />} title={t('modals.help.contact')}>
-            <p>For support, please visit our GitHub repository or contact the development team.</p>
+        <div className="pt-4 border-t border-slate-200 dark:border-slate-700" />
+
+        <HelpSection icon={<Sparkles size={24} />} title={t('modals.help.creditsTitle')}>
+            <p>
+                {t('modals.help.creditsText')}
+            </p>
+            <p className="flex items-center gap-2 mt-2">
+                <Mail size={16} />
+                <a href="mailto:bdh.malek@gmail.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                    bdh.malek@gmail.com
+                </a>
+            </p>
         </HelpSection>
+        
         
       </div>
       <div className="mt-8 flex justify-end">
