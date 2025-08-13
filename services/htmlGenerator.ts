@@ -224,25 +224,7 @@ const getStyles = (options: ExportOptions) => {
       }
 
 
-      .print-button {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 5px;
-        z-index: 100;
-      }
-      .print-button svg {
-        width: 24px;
-        height: 24px;
-        fill: #333;
-      }
       @media print {
-        .print-button {
-          display: none;
-        }
         body { padding: 0; background-color: #ffffff !important; font-weight: normal !important; }
         .page {
           margin: 0;
@@ -256,32 +238,6 @@ const getStyles = (options: ExportOptions) => {
         }
       }
 
-      .mobile-print-info {
-        display: none;
-        text-align: center;
-        padding: 1rem;
-        margin: 1rem auto;
-        max-width: 80%;
-        border-radius: 0.5rem;
-        background-color: #fefce8;
-        color: #a16207;
-        border: 1px solid #fef9c3;
-      }
-
-      @media screen and (max-width: 768px) {
-        .mobile-print-info {
-          display: block;
-        }
-        .print-button {
-          display: none;
-        }
-      }
-
-      @media print {
-        .print-button, .mobile-print-info {
-          display: none;
-        }
-      }
       ${themeStyles}
     </style>
   `;
@@ -355,17 +311,14 @@ export const generateHtmlForPrint = (
   options: ExportOptions
 ): string => {
     const content = generateHtmlForExport(doc, settings, options);
-    const injection = `
-    <body class="print-mode" oncontextmenu="return false;">
-      <button class="print-button" onclick="window.print()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
-      </button>
-      <div class="mobile-print-info">
-        <strong>Note pour les utilisateurs mobiles :</strong><br>
-        Pour enregistrer en PDF, utilisez la fonction "Partager" ou le menu de votre navigateur, puis sélectionnez "Imprimer" et "Enregistrer en PDF".
-      </div>
+    const printScript = `
+      <script>
+        window.MathJax.startup.promise.then(() => {
+          console.log('MathJax ready, triggering print...');
+          window.print();
+        });
+      </script>
     `;
-    // Inject print button and class
-    return content
-        .replace('<body oncontextmenu="return false;">', injection);
+    // Inject print script at the end of the body
+    return content.replace('</body>', `${printScript}</body>`);
 }
