@@ -63,11 +63,7 @@
       "showDifficulty": "Afficher la difficulté",
       "showKeywords": "Afficher les mots-clés",
       "showTitles": "Afficher les titres",
-      "print": "Imprimer",
-      "shareSuccess": "Document partagé avec succès !",
-      "downloadSuccess": "Document téléchargé avec succès !",
-      "popupBlocked": "Impossible d'ouvrir la fenêtre d'impression. Veuillez désactiver le bloqueur de pop-ups.",
-      "printError": "Un problème est survenu lors de l'impression. Veuillez réessayer."
+      "print": "Imprimer"
     },
     "settings": {
       "title": "Paramètres",

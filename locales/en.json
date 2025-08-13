@@ -63,11 +63,7 @@
       "showDifficulty": "Show difficulty",
       "showKeywords": "Show keywords",
       "showTitles": "Show titles",
-      "print": "Print",
-      "shareSuccess": "Document shared successfully!",
-      "downloadSuccess": "Document downloaded successfully!",
-      "popupBlocked": "Could not open print window. Please disable pop-up blockers.",
-      "printError": "An error occurred during printing. Please try again."
+      "print": "Print"
     },
     "settings": {
       "title": "Settings",

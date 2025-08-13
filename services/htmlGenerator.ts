@@ -4,32 +4,19 @@ const MATHJAX_SCRIPT = `
 <script>
   window.MathJax = {
     tex: {
-      inlineMath: [['\\\\(', '\\\\)'], ['$', '$']],
-      displayMath: [['\\\\[', '\\\\]'], ['$$', '$$']],
+      inlineMath: [['\\\\(', '\\\\)']],
+      displayMath: [['\\\\[', '\\\\]']],
       processEscapes: true,
-      processEnvironments: true,
-      packages: ['base', 'ams', 'noerrors', 'noundefined', 'autoload']
+      packages: ['base', 'ams', 'noerrors', 'noundefined']
     },
     chtml: {
-      fontURL: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2',
-      displayAlign: 'center',
-      displayIndent: '0em'
-    },
-    options: {
-      ignoreHtmlClass: 'tex2jax_ignore',
-      processHtmlClass: 'tex2jax_process',
-      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-      includeHtmlTags: ['div', 'span', 'p', 'li']
+      fontURL: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2'
     },
     startup: {
       ready: () => {
         window.MathJax.startup.defaultReady();
         window.MathJax.startup.promise.then(() => {
           console.log('MathJax initial typesetting complete');
-          // Force typesetting of all content
-          window.MathJax.typesetPromise().then(() => {
-            console.log('MathJax re-typesetting complete');
-          });
         });
       }
     }
