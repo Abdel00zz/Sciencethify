@@ -115,13 +115,13 @@ const ExerciseItem: React.FC<ExerciseItemProps> = ({ docId, exercise, index, isF
         {/* Footer with actions */}
         <div className="border-t border-gray-200 dark:border-gray-800 px-3 py-2 flex justify-end items-center gap-1 bg-gray-50/70 dark:bg-gray-900/50 backdrop-blur-sm">
             <Tooltip text={t('tooltips.moveUp')}>
-                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg hover:bg-indigo-100/50 dark:hover:bg-indigo-900/40" onClick={handleMoveUp} disabled={isFirst}>
-                     <ArrowUp size={16} className="text-indigo-600 dark:text-indigo-400" />
+                 <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-lg hover:bg-indigo-100/50 dark:hover:bg-indigo-900/40" onClick={handleMoveUp} disabled={isFirst}>
+                     <ArrowUp size={20} className="text-indigo-600 dark:text-indigo-400" />
                  </Button>
              </Tooltip>
              <Tooltip text={t('tooltips.moveDown')}>
-                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg hover:bg-indigo-100/50 dark:hover:bg-indigo-900/40" onClick={handleMoveDown} disabled={isLast}>
-                     <ArrowDown size={16} className="text-indigo-600 dark:text-indigo-400" />
+                 <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-lg hover:bg-indigo-100/50 dark:hover:bg-indigo-900/40" onClick={handleMoveDown} disabled={isLast}>
+                     <ArrowDown size={20} className="text-indigo-600 dark:text-indigo-400" />
                  </Button>
              </Tooltip>
             <div ref={actionsRef} className="relative z-10">
