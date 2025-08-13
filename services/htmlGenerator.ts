@@ -1,79 +1,37 @@
 import { Document, AppSettings, ExportOptions, Exercise } from '../types';
 
-// Déclarations TypeScript pour MathJax
-declare global {
-  interface Window {
-    MathJax: {
-      startup: {
-        defaultReady: () => void;
-        promise: Promise<void>;
-      };
-      typesetPromise: () => Promise<void>;
-      tex2chtml: (tex: string, options?: any) => HTMLElement;
-      tex2svg: (tex: string, options?: any) => SVGElement;
-    };
-  }
-}
-
 const MATHJAX_SCRIPT = `
 <script>
   window.MathJax = {
     tex: {
-      inlineMath: [['\\\\(', '\\\\)']],
-      displayMath: [['\\\\[', '\\\\]']],
+      inlineMath: [['\\\\(', '\\\\)'], ['$', '$']],
+      displayMath: [['\\\\[', '\\\\]'], ['$$', '$$']],
       processEscapes: true,
       processEnvironments: true,
-      packages: ['base', 'ams', 'noerrors', 'noundefined', 'autoload'],
-      macros: {
-        R: '{\\\\mathbb{R}}',
-        N: '{\\\\mathbb{N}}',
-        Z: '{\\\\mathbb{Z}}',
-        Q: '{\\\\mathbb{Q}}',
-        C: '{\\\\mathbb{C}}'
-      }
+      packages: ['base', 'ams', 'noerrors', 'noundefined', 'autoload']
     },
     chtml: {
       fontURL: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2',
-      adaptiveCSS: true,
-      matchFontHeight: false,
-      scale: 1
-    },
-    svg: {
-      fontCache: 'local'
+      displayAlign: 'center',
+      displayIndent: '0em'
     },
     options: {
       ignoreHtmlClass: 'tex2jax_ignore',
       processHtmlClass: 'tex2jax_process',
-      renderActions: {
-        addMenu: [0, '', '']
-      },
-      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+      includeHtmlTags: ['div', 'span', 'p', 'li']
     },
     startup: {
       ready: () => {
-        console.log('MathJax configuration loaded for print');
-        if (window.MathJax) {
-          window.MathJax.startup.defaultReady();
-          window.MathJax.startup.promise.then(() => {
-            console.log('MathJax initial typesetting complete for print');
-            // Forcer un nouveau rendu après le chargement
-            setTimeout(() => {
-              if (window.MathJax && window.MathJax.typesetPromise) {
-                window.MathJax.typesetPromise().then(() => {
-                  console.log('MathJax re-typesetting complete');
-                }).catch((error) => {
-                  console.error('MathJax re-typesetting error:', error);
-                });
-              }
-            }, 500);
-          }).catch((error) => {
-            console.error('MathJax startup error:', error);
+        window.MathJax.startup.defaultReady();
+        window.MathJax.startup.promise.then(() => {
+          console.log('MathJax initial typesetting complete');
+          // Force typesetting of all content
+          window.MathJax.typesetPromise().then(() => {
+            console.log('MathJax re-typesetting complete');
           });
-        }
+        });
       }
-    },
-    loader: {
-      load: ['[tex]/ams', '[tex]/noerrors', '[tex]/noundefined', '[tex]/autoload']
     }
   };
 </script>
@@ -82,68 +40,14 @@ const MATHJAX_SCRIPT = `
 
 const AUTOPRINT_SCRIPT = `
 <script>
-  let printAttempted = false;
-  
-  function attemptPrint() {
-    if (printAttempted) return;
-    printAttempted = true;
-    
-    console.log('Attempting to print...');
-    try {
-      window.print();
-    } catch (error) {
-      console.error('Print error:', error);
-    }
-  }
-  
-  function waitForMathJaxAndPrint() {
-    if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
-      window.MathJax.startup.promise.then(() => {
-        console.log('MathJax ready, waiting for typesetting...');
-        // Attendre un peu plus pour s'assurer que tout est rendu
-        setTimeout(() => {
-          if (window.MathJax.typesetPromise) {
-            window.MathJax.typesetPromise().then(() => {
-              console.log('MathJax typesetting complete, printing...');
-              setTimeout(attemptPrint, 500);
-            }).catch((error) => {
-              console.error('MathJax typesetting error:', error);
-              setTimeout(attemptPrint, 1000);
-            });
-          } else {
-            setTimeout(attemptPrint, 1000);
-          }
-        }, 1000);
-      }).catch((error) => {
-        console.error('MathJax startup error:', error);
-        setTimeout(attemptPrint, 2000);
-      });
-    } else {
-      // Fallback si MathJax n'est pas disponible
-      console.log('MathJax not available, printing anyway...');
-      setTimeout(attemptPrint, 2000);
-    }
-  }
-  
   window.addEventListener('load', () => {
-    console.log('Page loaded, waiting for MathJax...');
-    waitForMathJaxAndPrint();
-  });
-  
-  window.addEventListener('afterprint', () => {
-    console.log('Print dialog closed, closing window...');
     setTimeout(() => {
-      window.close();
-    }, 100);
+      window.print();
+    }, 1000);
   });
-  
-  // Fallback timeout au cas où quelque chose se passe mal
-  setTimeout(() => {
-    if (!printAttempted) {
-      console.log('Fallback print timeout reached');
-      attemptPrint();
-    }
-  }, 10000);
+  window.addEventListener('afterprint', () => {
+    window.close();
+  });
 </script>
 `;
 

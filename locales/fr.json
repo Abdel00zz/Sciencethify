@@ -64,8 +64,10 @@
       "showKeywords": "Afficher les mots-clés",
       "showTitles": "Afficher les titres",
       "print": "Imprimer",
-      "printError": "Impossible d'ouvrir la fenêtre d'impression. Veuillez désactiver les bloqueurs de pop-up.",
-      "printErrorMobile": "Problème survenu lors de l'impression. Veuillez réessayer ou utiliser un autre navigateur."
+      "shareSuccess": "Document partagé avec succès !",
+      "downloadSuccess": "Document téléchargé avec succès !",
+      "popupBlocked": "Impossible d'ouvrir la fenêtre d'impression. Veuillez désactiver le bloqueur de pop-ups.",
+      "printError": "Un problème est survenu lors de l'impression. Veuillez réessayer."
     },
     "settings": {
       "title": "Paramètres",

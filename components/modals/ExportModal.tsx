@@ -97,81 +97,78 @@ const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
     }));
   }, []);
 
-  const handlePrint = useCallback(() => {
+  const handlePrint = useCallback(async () => {
     setIsPrinting(true);
     
     try {
       const printHtml = generateHtmlForPrint(document, settings, options);
       
-      // Sur mobile, utiliser une approche différente
-      if (isMobile) {
-        // Créer un iframe temporaire pour l'impression mobile
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'absolute';
-        iframe.style.left = '-9999px';
-        iframe.style.width = '1px';
-        iframe.style.height = '1px';
-        document.body.appendChild(iframe);
-        
-        iframe.onload = () => {
-          try {
-            const iframeWindow = iframe.contentWindow;
-            if (iframeWindow) {
-              // Attendre que MathJax soit chargé avant d'imprimer
-              setTimeout(() => {
-                try {
-                  iframeWindow.print();
-                } catch (printError) {
-                  console.error('Erreur d\'impression mobile:', printError);
-                  addToast(t('modals.export.printErrorMobile'), 'error');
-                }
-                document.body.removeChild(iframe);
-                setIsPrinting(false);
-              }, 2000);
-            }
-          } catch (error) {
-            console.error('Erreur lors de la préparation de l\'impression mobile:', error);
-            addToast(t('modals.export.printErrorMobile'), 'error');
-            document.body.removeChild(iframe);
-            setIsPrinting(false);
-          }
-        };
-        
-        iframe.onerror = () => {
-          addToast(t('modals.export.printErrorMobile'), 'error');
-          document.body.removeChild(iframe);
+      // For mobile devices, try to use the Web Share API or download as PDF
+      if (isMobile && 'share' in navigator) {
+        try {
+          const blob = new Blob([printHtml], { type: 'text/html' });
+          const file = new File([blob], `${document.title}.html`, { type: 'text/html' });
+          
+          await navigator.share({
+            title: document.title,
+            text: `Document: ${document.title}`,
+            files: [file]
+          });
+          
+          addToast(t('modals.export.shareSuccess'), 'success');
           setIsPrinting(false);
-        };
-        
-        const iframeDoc = iframe.contentDocument;
-        if (iframeDoc) {
-          iframeDoc.open();
-          iframeDoc.write(printHtml);
-          iframeDoc.close();
+          return;
+        } catch (shareError) {
+          console.log('Share API failed, falling back to print:', shareError);
         }
-      } else {
-        // Approche desktop classique
-        const blob = new Blob([printHtml], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        
-        const printWindow = window.open(url, '_blank');
-        if (!printWindow) {
-          addToast(t('modals.export.printError'), 'error');
+      }
+      
+      // Fallback to traditional print method
+      const blob = new Blob([printHtml], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      
+      const printWindow = window.open(url, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+      
+      if (!printWindow) {
+        // If popup is blocked, try alternative method
+        if (isMobile) {
+          // For mobile, create a download link
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${document.title}.html`;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          addToast(t('modals.export.downloadSuccess'), 'success');
+        } else {
+          addToast(t('modals.export.popupBlocked'), 'error');
+        }
+        setIsPrinting(false);
+        URL.revokeObjectURL(url);
+        return;
+      }
+      
+      // Monitor print window
+      const timer = setInterval(() => {
+        if (printWindow.closed) {
+          clearInterval(timer);
           setIsPrinting(false);
           URL.revokeObjectURL(url);
-          return;
         }
-        
-        const timer = setInterval(() => {
-          if (printWindow.closed) {
-            clearInterval(timer);
-            setIsPrinting(false);
-            URL.revokeObjectURL(url);
+      }, 500);
+      
+      // Auto-close timer for mobile devices
+      if (isMobile) {
+        setTimeout(() => {
+          if (!printWindow.closed) {
+            printWindow.close();
           }
-        }, 500);
+        }, 10000); // Close after 10 seconds on mobile
       }
+      
     } catch (error) {
-      console.error('Erreur lors de la génération du contenu d\'impression:', error);
+      console.error('Print error:', error);
       addToast(t('modals.export.printError'), 'error');
       setIsPrinting(false);
     }
