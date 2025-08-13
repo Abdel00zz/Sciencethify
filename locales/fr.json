@@ -1,0 +1,143 @@
+
+{
+  "appName": "Mathify",
+  "dashboard": {
+    "title": "Mes Documents",
+    "newDocument": "Nouveau Document",
+    "import": "Importer des documents",
+    "noDocuments": "Aucun document pour l'instant.",
+    "createFirst": "Créez votre premier document pour commencer !",
+    "documentCard": {
+      "exercises": "exercices",
+      "class": "Classe",
+      "year": "Année",
+      "lastModified": "Modifié"
+    }
+  },
+  "documentEditor": {
+    "backToDashboard": "Retour aux documents",
+    "addExercise": "Ajouter un exercice",
+    "addFromImage": "Ajouter depuis une image",
+    "export": "Imprimer",
+    "noExercises": "Ce document est vide.",
+    "addFirstExercise": "Ajoutez votre premier exercice manuellement ou depuis une image."
+  },
+  "modals": {
+    "newDocument": {
+      "createTitle": "Créer un nouveau document",
+      "editTitle": "Modifier le document",
+      "titleLabel": "Titre",
+      "titlePlaceholder": "ex: Contrôle d'algèbre",
+      "classLabel": "Classe",
+      "classPlaceholder": "ex: Terminale S",
+      "yearLabel": "Année Scolaire",
+      "yearPlaceholder": "ex: 2023-2024",
+      "create": "Créer",
+      "update": "Mettre à jour"
+    },
+    "editExercise": {
+      "createTitle": "Nouvel Exercice",
+      "editTitle": "Modifier l'exercice",
+      "titleLabel": "Titre",
+      "difficultyLabel": "Difficulté",
+      "keywordsLabel": "Mots-clés (séparés par une virgule)",
+      "contentLabel": "Contenu (HTML + LaTeX)",
+      "preview": "Aperçu",
+      "save": "Enregistrer"
+    },
+    "export": {
+      "title": "Aperçu avant impression",
+      "columns": "Mise en page",
+      "one_column": "Une colonne",
+      "two_columns": "Deux colonnes",
+      "fontSize": "Taille du texte",
+      "small": "Petite",
+      "medium": "Moyenne",
+      "large": "Grande",
+      "theme": "Mode d'impression",
+      "color": "Couleur",
+      "default": "Défaut",
+      "inkSaver": "Économie d'encre",
+      "highContrast": "Contraste élevé",
+      "display": "Affichage",
+      "showDifficulty": "Afficher la difficulté",
+      "showKeywords": "Afficher les mots-clés",
+      "showTitles": "Afficher les titres",
+      "print": "Imprimer"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "geminiApiKey": "Clé API Google Gemini",
+      "geminiApiKeyPlaceholder": "Entrez votre clé API Google Gemini",
+      "verifyConnection": "Vérifier",
+      "verification": {
+        "verifying": "Vérification...",
+        "valid": "Connexion réussie !",
+        "invalid": "Clé API invalide ou échec de la connexion."
+      },
+      "language": "Langue",
+      "teacherName": "Nom de l'enseignant",
+      "schoolId": "Numéro d'établissement",
+      "save": "Enregistrer"
+    },
+    "help": {
+      "title": "Aide & À propos",
+      "editingTitle": "Modifier le Contenu",
+      "editingText": "Vous pouvez modifier les titres des documents en cliquant dessus. Les exercices peuvent être modifiés via le bouton 'Modifier'. Pour réorganiser les exercices, utilisez les boutons fléchés haut et bas sur chaque carte d'exercice.",
+      "syntaxTitle": "Syntaxe du Contenu",
+      "syntaxText": "Le champ de contenu des exercices accepte un mélange de HTML pour la mise en forme et de LaTeX pour les notations mathématiques.",
+      "inlineMath": "Pour les formules en ligne, entourez votre code LaTeX avec \\(...\\). Exemple :",
+      "displayMath": "Pour les formules plus grandes et centrées, entourez votre code LaTeX avec \\[...\\]. Exemple :",
+      "aiTitle": "Fonctionnalités IA",
+      "aiText": "Utilisez le bouton 'Ajouter depuis une image' pour que notre IA analyse et transcrive automatiquement vos exercices. Dans la fenêtre d'import, vous pouvez choisir que l'IA mette les mots-clés en gras pour vous.",
+      "about": "À propos de Mathify",
+      "aboutText": "Mathify est une plateforme éducative innovante pour les enseignants et étudiants en mathématiques. Elle utilise l'IA pour analyser des images d'exercices, extrayant automatiquement le contenu, la structure et les formules LaTeX pour faciliter la création de documents mathématiques.",
+      "contact": "Contact & Support"
+    },
+    "confirm": {
+      "title": "Êtes-vous sûr ?",
+      "text": "Cette action est irréversible.",
+      "confirm": "Confirmer",
+      "cancel": "Annuler"
+    },
+    "imageUpload": {
+      "title": "Ajouter depuis des Images",
+      "uploadArea": "Cliquez pour parcourir ou glissez des images ici",
+      "processing": "Analyse des images...",
+      "error": "Une erreur est survenue lors de l'analyse.",
+      "addExercises": "Ajouter {count} exercices",
+      "analysisResult": "Résultat de l'analyse",
+      "analyze_count": "Analyser {count} images",
+      "clear_all": "Tout effacer",
+      "queue_status_waiting": "En attente",
+      "queue_status_analyzing": "Analyse...",
+      "queue_status_success": "Succès",
+      "queue_status_error": "Erreur",
+      "optionsTitle": "Options d'analyse",
+      "boldKeywords": "Mettre les mots-clés en gras",
+      "reviseText": "Rectifier l'orthographe et le lexique",
+      "suggestHints": "Suggérer des indications pour les questions",
+      "apiKeyMissing": "Clé API manquante ou invalide. Veuillez la configurer dans les paramètres.",
+      "apiKeyNeededTitle": "Clé API requise",
+      "apiKeyNeededDescription": "Veuillez ajouter votre clé API Google Gemini dans les paramètres pour activer l'analyse d'images."
+    }
+  },
+  "actions": {
+    "edit": "Modifier",
+    "duplicate": "Dupliquer",
+    "delete": "Supprimer",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "open": "Ouvrir",
+    "export": "Exporter",
+    "exportJson": "Exporter JSON",
+    "actions": "Actions"
+  },
+  "tooltips": {
+    "settings": "Paramètres",
+    "help": "Aide",
+    "actions": "Actions",
+    "moveUp": "Déplacer vers le haut",
+    "moveDown": "Déplacer vers le bas"
+  }
+}

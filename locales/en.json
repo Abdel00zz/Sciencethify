@@ -1,0 +1,143 @@
+
+{
+  "appName": "Mathify",
+  "dashboard": {
+    "title": "My Documents",
+    "newDocument": "New Document",
+    "import": "Import Documents",
+    "noDocuments": "No documents yet.",
+    "createFirst": "Create your first document to get started!",
+    "documentCard": {
+      "exercises": "exercises",
+      "class": "Class",
+      "year": "Year",
+      "lastModified": "Modified"
+    }
+  },
+  "documentEditor": {
+    "backToDashboard": "Back to documents",
+    "addExercise": "Add exercise",
+    "addFromImage": "Add from image",
+    "export": "Print",
+    "noExercises": "This document is empty.",
+    "addFirstExercise": "Add your first exercise manually or from an image."
+  },
+  "modals": {
+    "newDocument": {
+      "createTitle": "Create New Document",
+      "editTitle": "Edit Document",
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g., Algebra Test",
+      "classLabel": "Class",
+      "classPlaceholder": "e.g., Grade 11",
+      "yearLabel": "School Year",
+      "yearPlaceholder": "e.g., 2023-2024",
+      "create": "Create",
+      "update": "Update"
+    },
+    "editExercise": {
+      "createTitle": "New Exercise",
+      "editTitle": "Edit Exercise",
+      "titleLabel": "Title",
+      "difficultyLabel": "Difficulty",
+      "keywordsLabel": "Keywords (comma-separated)",
+      "contentLabel": "Content (HTML + LaTeX)",
+      "preview": "Preview",
+      "save": "Save Changes"
+    },
+    "export": {
+      "title": "Print Preview",
+      "columns": "Layout",
+      "one_column": "Single Column",
+      "two_columns": "Two Columns",
+      "fontSize": "Text size",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "theme": "Print mode",
+      "color": "Color",
+      "default": "Default",
+      "inkSaver": "Ink saver",
+      "highContrast": "High Contrast",
+      "display": "Display",
+      "showDifficulty": "Show difficulty",
+      "showKeywords": "Show keywords",
+      "showTitles": "Show titles",
+      "print": "Print"
+    },
+    "settings": {
+      "title": "Settings",
+      "geminiApiKey": "Google Gemini API Key",
+      "geminiApiKeyPlaceholder": "Enter your Google Gemini API Key",
+      "verifyConnection": "Verify",
+      "verification": {
+        "verifying": "Verifying...",
+        "valid": "Connection successful!",
+        "invalid": "Invalid API Key or connection failed."
+      },
+      "language": "Language",
+      "teacherName": "Teacher's Name",
+      "schoolId": "School ID/Number",
+      "save": "Save Settings"
+    },
+    "help": {
+      "title": "Help & About",
+      "editingTitle": "Editing Content",
+      "editingText": "You can edit document titles by clicking on them. Exercises can be modified using the 'Edit' button. To reorder exercises, use the up and down arrow buttons on each exercise card.",
+      "syntaxTitle": "Content Syntax",
+      "syntaxText": "The exercise content field accepts a mix of HTML for formatting and LaTeX for mathematical notation.",
+      "inlineMath": "For inline formulas, wrap your LaTeX with \\(...\\). Example:",
+      "displayMath": "For larger, centered formulas, wrap your LaTeX with \\[...\\]. Example:",
+      "aiTitle": "AI Features",
+      "aiText": "Use the 'Add from Image' button to let our AI analyze and transcribe your exercises automatically. In the upload window, you can choose to have the AI bold key terms for you.",
+      "about": "About Mathify",
+      "aboutText": "Mathify is an innovative educational platform for math teachers and students. It uses AI to analyze images of math exercises, automatically extracting content, structure, and LaTeX formulas to streamline the creation of structured mathematical documents.",
+      "contact": "Contact & Support"
+    },
+    "confirm": {
+      "title": "Are you sure?",
+      "text": "This action cannot be undone.",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    },
+    "imageUpload": {
+      "title": "Add from Images",
+      "uploadArea": "Click to browse or drag images here",
+      "processing": "Analyzing images...",
+      "error": "An error occurred during analysis.",
+      "addExercises": "Add {count} Exercises",
+      "analysisResult": "Analysis Result",
+      "analyze_count": "Analyze {count} Images",
+      "clear_all": "Clear All",
+      "queue_status_waiting": "Waiting",
+      "queue_status_analyzing": "Analyzing...",
+      "queue_status_success": "Success",
+      "queue_status_error": "Error",
+      "optionsTitle": "Analysis Options",
+      "boldKeywords": "Bold keywords in content",
+      "reviseText": "Correct spelling & grammar",
+      "suggestHints": "Suggest hints for questions",
+      "apiKeyMissing": "API Key is missing or invalid. Please configure it in settings.",
+      "apiKeyNeededTitle": "API Key Required",
+      "apiKeyNeededDescription": "Please add your Google Gemini API key in the settings to enable image analysis."
+    }
+  },
+  "actions": {
+    "edit": "Edit",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "close": "Close",
+    "cancel": "Cancel",
+    "open": "Open",
+    "export": "Export",
+    "exportJson": "Export JSON",
+    "actions": "Actions"
+  },
+  "tooltips": {
+    "settings": "Settings",
+    "help": "Help",
+    "actions": "Actions",
+    "moveUp": "Move Up",
+    "moveDown": "Move Down"
+  }
+}
