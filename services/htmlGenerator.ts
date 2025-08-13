@@ -107,7 +107,7 @@ const getStyles = (options: ExportOptions) => {
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       }
 
-      header { text-align: center; margin-bottom: 2.5rem; }
+      header { text-align: center; margin-bottom: 2.5rem; column-span: all; break-after: column; }
       .doc-title { font-family: 'Manrope', sans-serif; font-size: 2.0em; font-weight: 800; margin: 0; color: #111827; }
       .doc-meta { display: flex; justify-content: space-between; width: 100%; max-width: 400px; margin: 0.5rem auto 0; font-size: 0.9em; color: #4b5563; }
       
@@ -288,15 +288,15 @@ export const generateHtmlForExport = (
     </head>
     <body oncontextmenu="return false;">
       <div class="page">
-        <header>
-          <h1 class="doc-title">${doc.title}</h1>
-          <div class="doc-meta">
-            <span>${settings.teacherName || doc.className}</span>
-            <span>${doc.schoolYear}</span>
-            <span>${formattedDate}</span>
-          </div>
-        </header>
         <main class="content">
+          <header>
+            <h1 class="doc-title">${doc.title}</h1>
+            <div class="doc-meta">
+              <span>${settings.teacherName || doc.className}</span>
+              <span>${doc.schoolYear}</span>
+              <span>${formattedDate}</span>
+            </div>
+          </header>
           ${doc.exercises.map((ex, i) => renderExercise(ex, i, options)).join('')}
         </main>
       </div>
