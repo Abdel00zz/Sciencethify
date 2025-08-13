@@ -1,8 +1,8 @@
 
 export const mathjaxConfig = {
   tex: {
-    inlineMath: [['$', '$'], ['\\(', '\\)']],
-    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']],
     processEscapes: true,
     packages: ['base', 'ams', 'noerrors', 'noundefined'],
   },

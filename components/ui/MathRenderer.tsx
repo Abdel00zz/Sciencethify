@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { MathJax } from 'better-react-mathjax';
 import Spinner from './Spinner';
 
@@ -20,6 +20,15 @@ const MathRenderer: React.FC<MathRendererProps> = ({ content, className }) => {
   }
   
   const [isTypesetting, setIsTypesetting] = useState(true);
+
+  useEffect(() => {
+    // Fallback : force MathJax to typeset when content changes (utile en production)
+    if (typeof window !== 'undefined' && (window as any).MathJax?.typesetPromise) {
+      (window as any).MathJax.typesetPromise()
+        .then(() => setIsTypesetting(false))
+        .catch(() => setIsTypesetting(false));
+    }
+  }, [content]);
 
   // This callback is likely firing correctly, but if the content is empty,
   // nothing appears, which is the bug.
