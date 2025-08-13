@@ -255,6 +255,33 @@ const getStyles = (options: ExportOptions) => {
           color: #000000 !important;
         }
       }
+
+      .mobile-print-info {
+        display: none;
+        text-align: center;
+        padding: 1rem;
+        margin: 1rem auto;
+        max-width: 80%;
+        border-radius: 0.5rem;
+        background-color: #fefce8;
+        color: #a16207;
+        border: 1px solid #fef9c3;
+      }
+
+      @media screen and (max-width: 768px) {
+        .mobile-print-info {
+          display: block;
+        }
+        .print-button {
+          display: none !important;
+        }
+      }
+
+      @media print {
+        .mobile-print-info {
+          display: none;
+        }
+      }
       ${themeStyles}
     </style>
   `;

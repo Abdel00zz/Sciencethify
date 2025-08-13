@@ -84,7 +84,7 @@ const MathRenderer: React.FC<MathRendererProps> = ({ content, className }) => {
           background-color: #e0e7ff;
           color: #4338ca;
           font-weight: 600;
-          font-size: 0.8rem;
+          font-size: 0.75rem;
         }
         .modern-lists ol ol {
           counter-reset: level2;
@@ -108,7 +108,7 @@ const MathRenderer: React.FC<MathRendererProps> = ({ content, className }) => {
           content: counter(level1) "." counter(level2) "." counter(level3);
           background-color: #f1f5f9;
           color: #64748b;
-          font-size: 0.7rem;
+          font-size: 0.65rem;
         }
 
         :global(.dark) .modern-lists li::before {
