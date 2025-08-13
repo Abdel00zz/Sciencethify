@@ -102,37 +102,15 @@ const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
     
     try {
       const printHtml = generateHtmlForPrint(document, settings, options);
-      
-      // For mobile devices, try to use the Web Share API or download as PDF
-      if (isMobile && 'share' in navigator) {
-        try {
-          const blob = new Blob([printHtml], { type: 'text/html' });
-          const file = new File([blob], `${document.title}.html`, { type: 'text/html' });
-          
-          await navigator.share({
-            title: document.title,
-            text: `Document: ${document.title}`,
-            files: [file]
-          });
-          
-          addToast(t('modals.export.shareSuccess'), 'success');
-          setIsPrinting(false);
-          return;
-        } catch (shareError) {
-          console.log('Share API failed, falling back to print:', shareError);
-        }
-      }
-      
-      // Fallback to traditional print method
       const blob = new Blob([printHtml], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
       
-      const printWindow = window.open(url, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
-      
-      if (!printWindow) {
-        // If popup is blocked, try alternative method
-        if (isMobile) {
-          // For mobile, create a download link
+      // For mobile devices, open HTML and trigger print directly
+      if (isMobile) {
+        const printWindow = window.open(url, '_blank', 'width=device-width,height=device-height,scrollbars=yes,resizable=yes');
+        
+        if (!printWindow) {
+          // If popup is blocked, create a download link
           const link = document.createElement('a');
           link.href = url;
           link.download = `${document.title}.html`;
@@ -141,9 +119,39 @@ const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
           link.click();
           document.body.removeChild(link);
           addToast(t('modals.export.downloadSuccess'), 'success');
-        } else {
-          addToast(t('modals.export.popupBlocked'), 'error');
+          setIsPrinting(false);
+          URL.revokeObjectURL(url);
+          return;
         }
+        
+        // Wait for the window to load, then trigger print
+        printWindow.onload = () => {
+          setTimeout(() => {
+            try {
+              printWindow.print();
+            } catch (printError) {
+              console.log('Print function not available on mobile:', printError);
+            }
+          }, 1000); // Wait 1 second for content to fully load
+        };
+        
+        // Monitor print window
+        const timer = setInterval(() => {
+          if (printWindow.closed) {
+            clearInterval(timer);
+            setIsPrinting(false);
+            URL.revokeObjectURL(url);
+          }
+        }, 500);
+        
+        return;
+      }
+      
+      // Desktop behavior - traditional print method
+      const printWindow = window.open(url, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+      
+      if (!printWindow) {
+        addToast(t('modals.export.popupBlocked'), 'error');
         setIsPrinting(false);
         URL.revokeObjectURL(url);
         return;
@@ -157,15 +165,6 @@ const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
           URL.revokeObjectURL(url);
         }
       }, 500);
-      
-      // Auto-close timer for mobile devices
-      if (isMobile) {
-        setTimeout(() => {
-          if (!printWindow.closed) {
-            printWindow.close();
-          }
-        }, 10000); // Close after 10 seconds on mobile
-      }
       
     } catch (error) {
       console.error('Print error:', error);
