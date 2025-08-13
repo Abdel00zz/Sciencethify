@@ -1,12 +1,11 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Document, ExportOptions } from '../../types';
 import { useSettings } from '../../hooks/useSettings';
-import { generateHtmlForExport, generateHtmlForPrint } from '../../services/htmlGenerator';
+import { generateHtmlForPrint } from '../../services/htmlGenerator';
 import Button from '../ui/Button';
 import Checkbox from '../ui/Checkbox';
-import { Printer, Loader2, X } from 'lucide-react';
+import { Printer, Download, X } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
-import { debounce } from '../../utils/debounce';
 import { useMobile } from '../../hooks/useMobile';
 
 interface ExportViewProps {
@@ -41,8 +40,6 @@ const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
   const { settings, t } = useSettings();
   const { addToast } = useToast();
   const isMobile = useMobile();
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const previewContainerRef = useRef<HTMLDivElement>(null);
   
   const [options, setOptions] = useState<ExportOptions>({
     columns: 1,
@@ -53,39 +50,7 @@ const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
     showTitles: true,
   });
   
-  const [isPrinting, setIsPrinting] = useState(false);
-  const [previewHtml, setPreviewHtml] = useState('');
-  const [isLoadingPreview, setIsLoadingPreview] = useState(true);
-
-  const updateScale = useCallback(debounce(() => {
-    if (!iframeRef.current || !previewContainerRef.current) return;
-    
-    const iframe = iframeRef.current;
-    const container = previewContainerRef.current;
-    const PAGE_WIDTH_PX = 794; 
-    
-    const scale = Math.min(1, container.clientWidth / PAGE_WIDTH_PX);
-    
-    const htmlEl = iframe.contentDocument?.documentElement;
-    if (htmlEl) {
-      htmlEl.style.setProperty('zoom', scale.toString());
-      htmlEl.style.setProperty('overflow', 'auto');
-    }
-  }, 50), []);
-
-  useEffect(() => {
-    setIsLoadingPreview(true);
-    const html = generateHtmlForExport(document, settings, options);
-    setPreviewHtml(html);
-  }, [document, settings, options]);
-
-  useEffect(() => {
-    window.addEventListener('resize', updateScale);
-    return () => {
-      window.removeEventListener('resize', updateScale);
-      updateScale.cancel();
-    };
-  }, [updateScale]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleOptionChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -97,35 +62,41 @@ const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
     }));
   }, []);
 
-  const handlePrint = useCallback(() => {
-    setIsPrinting(true);
-    const printHtml = generateHtmlForPrint(document, settings, options);
-    const blob = new Blob([printHtml], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    
-    const printWindow = window.open(url, '_blank');
-    if (!printWindow) {
-      addToast("Could not open print window. Please disable pop-up blockers.", 'error');
-      setIsPrinting(false);
-      URL.revokeObjectURL(url);
-      return;
-    }
-    const timer = setInterval(() => {
-      if (printWindow.closed) {
-        clearInterval(timer);
-        setIsPrinting(false);
-        URL.revokeObjectURL(url);
+  const handleExport = useCallback(async () => {
+    setIsGenerating(true);
+    try {
+      const printHtml = await generateHtmlForPrint(document, settings, options);
+      const blob = new Blob([printHtml], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+
+      if (isMobile) {
+        // On mobile, trigger download directly
+        link.download = `${document.title.replace(/[^a-z0-9]/gi, '_') || 'document'}.html`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        addToast(t('modals.export.download_started'), 'success');
+      } else {
+        // On desktop, open in a new tab for printing
+        window.open(url, '_blank');
       }
-    }, 500);
-  }, [document, settings, options, addToast]);
-  
-  const handleIframeLoad = () => {
-    setIsLoadingPreview(false);
-    updateScale();
-  };
+      
+      // Delay revoking the URL to ensure the new tab or download can start
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    } catch (error) {
+      console.error("Error generating file:", error);
+      addToast(t('modals.export.generation_error'), 'error');
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [document, settings, options, addToast, isMobile, t]);
 
   const optionsPanel = (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 md:p-8">
       <OptionSelect label={t('modals.export.columns')} name="columns" value={options.columns} onChange={handleOptionChange}>
         <option value="1">{t('modals.export.one_column')}</option>
         <option value="2">{t('modals.export.two_columns')}</option>
@@ -150,46 +121,32 @@ const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
   );
 
   return (
-    <div className="fixed inset-0 bg-gray-100 dark:bg-gray-950 z-50 flex flex-col animate-fade-in" role="dialog" aria-modal="true">
-      <header className="flex-shrink-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
-        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div className="min-w-0">
-                <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 truncate">{t('modals.export.title')}</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 truncate" title={document.title}>{document.title}</p>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-                 <Button variant="primary" onClick={handlePrint} isLoading={isPrinting} disabled={isLoadingPreview}>
-                    <Printer size={16} className="mr-2" />
-                    {t('modals.export.print')}
-                </Button>
-                <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close Print Preview">
-                    <X size={24} />
-                </Button>
-            </div>
-        </div>
-      </header>
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-75 z-50 flex items-center justify-center animate-fade-in" role="dialog" aria-modal="true" onClick={onClose}>
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[90vw] max-w-md max-h-[90vh] flex flex-col overflow-hidden transform transition-all duration-300 ease-out-cubic" onClick={e => e.stopPropagation()}>
+        <header className="flex-shrink-0 px-6 py-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t('modals.export.title')}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 truncate" title={document.title}>{document.title}</p>
+          </div>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close">
+            <X size={24} />
+          </Button>
+        </header>
 
-      <main className="flex-1 flex flex-col md:flex-row min-h-0">
-        <aside className="w-full md:w-[280px] lg:w-[320px] flex-shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-6 overflow-y-auto custom-scrollbar">
-            {optionsPanel}
-        </aside>
+        <main className="flex-1 overflow-y-auto custom-scrollbar">
+          {optionsPanel}
+        </main>
 
-        <div ref={previewContainerRef} className="flex-1 bg-gray-200 dark:bg-gray-800/50 p-4 sm:p-8 overflow-auto custom-scrollbar relative shadow-inner">
-             {isLoadingPreview && (
-             <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-800/50">
-                <Loader2 className="w-8 h-8 animate-spin text-slate-500" />
-            </div>
-          )}
-          <iframe
-            ref={iframeRef}
-            srcDoc={previewHtml}
-            title="Export Preview"
-            className={`w-full h-full border-0 transition-opacity duration-300 ${isLoadingPreview ? 'opacity-0' : 'opacity-100'}`}
-            sandbox="allow-scripts allow-same-origin"
-            onLoad={handleIframeLoad}
-          />
-        </div>
-      </main>
+        <footer className="flex-shrink-0 px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-800 flex justify-end items-center gap-4">
+          <Button variant="outline" onClick={onClose}>
+            {t('common.cancel')}
+          </Button>
+          <Button variant="primary" onClick={handleExport} isLoading={isGenerating}>
+            {isMobile ? <Download size={16} className="mr-2" /> : <Printer size={16} className="mr-2" />}
+            {isMobile ? t('modals.export.download') : t('modals.export.print_preview')}
+          </Button>
+        </footer>
+      </div>
     </div>
   );
 };
