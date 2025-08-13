@@ -27,8 +27,6 @@ interface SettingsContextType {
   isMobile: boolean;
   isApiKeyValid: boolean;
   t: (key: string, replacements?: Record<string, string | number>) => string;
-  isI18nLoading: boolean;
-  i18nError: Error | null;
   verifyApiKey: (key: string) => Promise<boolean>;
   updateSettings: (newSettings: Partial<AppSettings>) => void;
 }
@@ -47,7 +45,7 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [settings, setSettings] = useState<AppSettings>(() => getInitialState<AppSettings>(SETTINGS_STORAGE_KEY, defaultSettings));
   const [isApiKeyValid, setIsApiKeyValid] = useState(false);
   const isMobile = useMobile();
-  const { t, isLoading: isI18nLoading, error: i18nError } = useI18n(settings.language);
+  const { t } = useI18n(settings.language);
 
   const verifyApiKey = useCallback(async (key: string): Promise<boolean> => {
     const isValid = await verifyGeminiApiKey(key);
@@ -80,8 +78,6 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     isMobile,
     isApiKeyValid,
     t,
-    isI18nLoading,
-    i18nError,
     verifyApiKey,
     updateSettings,
   };

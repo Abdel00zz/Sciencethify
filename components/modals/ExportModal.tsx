@@ -4,10 +4,10 @@ import { useSettings } from '../../hooks/useSettings';
 import { generateHtmlForExport, generateHtmlForPrint } from '../../services/htmlGenerator';
 import Button from '../ui/Button';
 import Checkbox from '../ui/Checkbox';
-import { Printer, Loader2, X } from 'lucide-react';
+import { Printer, Download, X, Loader2 } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
-import { debounce } from '../../utils/debounce';
 import { useMobile } from '../../hooks/useMobile';
+import { debounce } from '../../utils/debounce';
 
 interface ExportViewProps {
   document: Document;
@@ -37,7 +37,7 @@ const OptionSelect: React.FC<{
   </div>
 );
 
-const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
+const ExportModal: React.FC<ExportViewProps> = ({ document: doc, onClose }) => {
   const { settings, t } = useSettings();
   const { addToast } = useToast();
   const isMobile = useMobile();
@@ -53,7 +53,7 @@ const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
     showTitles: true,
   });
   
-  const [isPrinting, setIsPrinting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [previewHtml, setPreviewHtml] = useState('');
   const [isLoadingPreview, setIsLoadingPreview] = useState(true);
 
@@ -75,9 +75,9 @@ const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
 
   useEffect(() => {
     setIsLoadingPreview(true);
-    const html = generateHtmlForExport(document, settings, options);
+    const html = generateHtmlForExport(doc, settings, options);
     setPreviewHtml(html);
-  }, [document, settings, options]);
+  }, [doc, settings, options]);
 
   useEffect(() => {
     window.addEventListener('resize', updateScale);
@@ -97,27 +97,35 @@ const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
     }));
   }, []);
 
-  const handlePrint = useCallback(() => {
-    setIsPrinting(true);
-    const printHtml = generateHtmlForPrint(document, settings, options);
-    const blob = new Blob([printHtml], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    
-    const printWindow = window.open(url, '_blank');
-    if (!printWindow) {
-      addToast("Could not open print window. Please disable pop-up blockers.", 'error');
-      setIsPrinting(false);
-      URL.revokeObjectURL(url);
-      return;
-    }
-    const timer = setInterval(() => {
-      if (printWindow.closed) {
-        clearInterval(timer);
-        setIsPrinting(false);
-        URL.revokeObjectURL(url);
+  const handleExport = useCallback(() => {
+    setIsGenerating(true);
+    try {
+      const printHtml = generateHtmlForPrint(doc, settings, options);
+      const blob = new Blob([printHtml], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+
+      if (isMobile) {
+        link.download = `${doc.title.replace(/[^a-z0-9]/gi, '_') || 'document'}.html`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        addToast(t('modals.export.download_started'), 'success');
+      } else {
+        window.open(url, '_blank');
       }
-    }, 500);
-  }, [document, settings, options, addToast]);
+      
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    } catch (error) {
+      console.error("Error generating file:", error);
+      addToast(t('modals.export.generation_error'), 'error');
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [doc, settings, options, addToast, isMobile, t]);
   
   const handleIframeLoad = () => {
     setIsLoadingPreview(false);
@@ -155,12 +163,12 @@ const ExportModal: React.FC<ExportViewProps> = ({ document, onClose }) => {
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div className="min-w-0">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 truncate">{t('modals.export.title')}</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 truncate" title={document.title}>{document.title}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 truncate" title={doc.title}>{doc.title}</p>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
-                 <Button variant="primary" onClick={handlePrint} isLoading={isPrinting} disabled={isLoadingPreview}>
-                    <Printer size={16} className="mr-2" />
-                    {t('modals.export.print')}
+                 <Button variant="primary" onClick={handleExport} isLoading={isGenerating} disabled={isLoadingPreview}>
+                    {isMobile ? <Download size={16} className="mr-2" /> : <Printer size={16} className="mr-2" />}
+                    {isMobile ? t('modals.export.download') : t('modals.export.print_preview')}
                 </Button>
                 <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close Print Preview">
                     <X size={24} />

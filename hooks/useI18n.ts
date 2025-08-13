@@ -67,7 +67,11 @@ const enTranslations = {
       "showDifficulty": "Show difficulty",
       "showKeywords": "Show keywords",
       "showTitles": "Show titles",
-      "print": "Print"
+      "print": "Print",
+      "print_preview": "Print Preview",
+      "download": "Download",
+      "download_started": "Download started...",
+      "generation_error": "Error generating file."
     },
     "settings": {
       "title": "Settings",
@@ -210,7 +214,11 @@ const frTranslations = {
       "showDifficulty": "Afficher la difficulté",
       "showKeywords": "Afficher les mots-clés",
       "showTitles": "Afficher les titres",
-      "print": "Imprimer"
+      "print": "Imprimer",
+      "print_preview": "Aperçu avant impression",
+      "download": "Télécharger",
+      "download_started": "Téléchargement commencé...",
+      "generation_error": "Erreur lors de la génération du fichier."
     },
     "settings": {
       "title": "Paramètres",
@@ -294,7 +302,7 @@ const translations = {
   fr: frTranslations,
 };
 
-const translationCache: { [key: string]: any } = {};
+const flatTranslationCache: { [key: string]: Record<string, string> } = {};
 
 const flattenObject = (obj: any, prefix: string = ''): Record<string, string> => {
   return Object.keys(obj).reduce((acc, k) => {
@@ -309,34 +317,14 @@ const flattenObject = (obj: any, prefix: string = ''): Record<string, string> =>
 };
 
 export function useI18n(language: 'en' | 'fr') {
-  const [rawLocale, setRawLocale] = useState<any | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
   const flatLocale = useMemo(() => {
-    return rawLocale ? flattenObject(rawLocale) : null;
-  }, [rawLocale]);
-
-  useEffect(() => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      if (translationCache[language]) {
-        setRawLocale(translationCache[language]);
-      } else {
-        const data = translations[language];
-        if (!data) {
-          throw new Error(`Translation for language "${language}" not found.`);
-        }
-        translationCache[language] = data;
-        setRawLocale(data);
-      }
-    } catch (err) {
-      console.error(`Could not load translation file for language: ${language}`, err);
-      setError(err as Error);
-    } finally {
-      setIsLoading(false);
+    if (flatTranslationCache[language]) {
+      return flatTranslationCache[language];
     }
+    const rawLocale = translations[language] || translations['en'];
+    const flattened = flattenObject(rawLocale);
+    flatTranslationCache[language] = flattened;
+    return flattened;
   }, [language]);
 
   const t = useCallback((path: string, replacements?: Record<string, string | number>): string => {
@@ -355,5 +343,5 @@ export function useI18n(language: 'en' | 'fr') {
     return str;
   }, [flatLocale]);
 
-  return { t, isLoading, error };
+  return { t, isLoading: false, error: null };
 }
