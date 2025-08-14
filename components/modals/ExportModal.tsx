@@ -103,22 +103,38 @@ const ExportModal: React.FC<ExportViewProps> = ({ document: doc, onClose }) => {
       const printHtml = generateHtmlForPrint(doc, settings, options);
       const blob = new Blob([printHtml], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = url;
 
       if (isMobile) {
+        const link = document.createElement('a');
+        link.href = url;
         link.download = `${doc.title.replace(/[^a-z0-9]/gi, '_') || 'document'}.html`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         addToast(t('modals.export.download_started'), 'success');
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       } else {
-        window.open(url, '_blank');
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = url;
+        iframe.onload = () => {
+          if (iframe.contentWindow) {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            // We cannot reliably know when the print dialog is closed.
+            // So we'll just remove the iframe and revoke the URL after a delay.
+            setTimeout(() => {
+              document.body.removeChild(iframe);
+              URL.revokeObjectURL(url);
+            }, 2000);
+          } else {
+            addToast(t('modals.export.generation_error'), 'error');
+            document.body.removeChild(iframe);
+            URL.revokeObjectURL(url);
+          }
+        };
+        document.body.appendChild(iframe);
       }
-      
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-
     } catch (error) {
       console.error("Error generating file:", error);
       addToast(t('modals.export.generation_error'), 'error');
@@ -168,7 +184,7 @@ const ExportModal: React.FC<ExportViewProps> = ({ document: doc, onClose }) => {
             <div className="flex items-center gap-2 sm:gap-4">
                  <Button variant="primary" onClick={handleExport} isLoading={isGenerating} disabled={isLoadingPreview}>
                     {isMobile ? <Download size={16} className="mr-2" /> : <Printer size={16} className="mr-2" />}
-                    {isMobile ? t('modals.export.download') : t('modals.export.print_preview')}
+                    {isMobile ? t('modals.export.download') : t('modals.export.print')}
                 </Button>
                 <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close Print Preview">
                     <X size={24} />
