@@ -67,7 +67,10 @@ export const analyzeImageWithGemini = async (
     "Pay special attention to the 'title'. It MUST be a short, pedagogical summary of the exercise's main objective (e.g., 'Solving Quadratic Equations', 'Vector Dot Product'). The title MUST be under 6 words and accurately reflect the exercise content.",
     "IMPORTANT: Detect the language of the text in the image. Your entire response (title, keywords, content) MUST be in that same language. DO NOT TRANSLATE.",
     "The 'content' field must be valid, semantic HTML. Use <p> for paragraphs, and nested <ol> or <ul> for lists. All math must be LaTeX, using \\( ... \\) for inline and \\[ ... \\] for display math. Strictly conform to the schema.",
-    "To improve readability, for any inline math `\\(...\\)` that contains complex structures like fractions (`\\frac`), summations (`\\sum`), or integrals (`\\int`), you MUST add `\\displaystyle` at the beginning of the formula's content. Example: `\\(\\displaystyle \\frac{a}{b}\\)`. Apply this only to complex formulas, not to simple variables or expressions."
+    "To improve readability, for any inline math `\\(...\\)` that contains complex structures like fractions (`\\frac`), summations (`\\sum`), or integrals (`\\int`), you MUST add `\\displaystyle` at the beginning of the formula's content. Example: `\\(\\displaystyle \\frac{a}{b}\\)`. Apply this only to complex formulas, not to simple variables or expressions.",
+    "For vectors, consistently use `\\vec{u}` for single-letter vectors and `\\overrightarrow{AB}` for vectors over multiple letters. Do not use plain text arrows.",
+    "For complex mathematical structures like systems of equations, use appropriate LaTeX environments such as `cases` or `aligned`. For matrices, use `pmatrix` for parentheses or `bmatrix` for square brackets.",
+    "Ensure correct use of `\\left` and `\\right` for delimiters like parentheses, brackets, and braces that enclose multi-line or large expressions (e.g., tall fractions, integrals) to ensure they scale correctly."
   ];
 
   if (options.reviseText) {

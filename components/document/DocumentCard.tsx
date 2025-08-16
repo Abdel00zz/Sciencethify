@@ -80,7 +80,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, isRecent = false 
                 <div className="flex items-center gap-4 whitespace-nowrap">
                     <div className="flex items-center gap-1.5"><Book size={12} /><span className="font-medium">{document.className}</span></div>
                     <div className="flex items-center gap-1.5"><Calendar size={12} /><span className="font-medium">{document.schoolYear}</span></div>
-                    <div className="flex items-center gap-1.5"><ListOrdered size={12} /><span className="font-medium">{document.exercises.length} {t('dashboard.documentCard.exercises')}</span></div>
+                    <div className="flex items-center gap-1.5"><ListOrdered size={12} /><span className="font-medium">{(document.exercises || []).length} {t('dashboard.documentCard.exercises')}</span></div>
                 </div>
                 <div className="text-slate-400 dark:text-slate-500 font-medium">
                     <span>{lastModified.toLocaleDateString(settings.language)}</span>
