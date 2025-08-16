@@ -97,27 +97,67 @@
         background: #eef2ff; /* indigo-50 */
       }
     </style>
-<script id="MathJax-script" defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script type="importmap">
-{
-  "imports": {
-    "@/": "./",
-    "react/": "https://esm.sh/react@^19.1.1/",
-    "react": "https://esm.sh/react@^19.1.1",
-    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.13.0",
-    "better-react-mathjax": "https://esm.sh/better-react-mathjax@^2.3.0",
-    "react-router-dom": "https://esm.sh/react-router-dom@^6.24.1",
-    "react-dropzone": "https://esm.sh/react-dropzone@^14.3.8",
-    "lucide-react": "https://esm.sh/lucide-react@^0.417.0"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
+    
+    <!-- IMPORTANT: Configuration MathJax AVANT le chargement du script -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true,
+          processEnvironments: true,
+          packages: {'[+]': ['html', 'ams']}
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          processHtmlClass: 'tex2jax_process',
+          ignoreHtmlClass: 'tex2jax_ignore'
+        },
+        startup: {
+          typeset: false,  // Désactiver le typesetting automatique au démarrage
+          ready: () => {
+            MathJax.startup.defaultReady();
+            MathJax.startup.promise.then(() => {
+              console.log('MathJax loaded and ready');
+              // Notifier que MathJax est prêt
+              window.MathJaxReady = true;
+            });
+          }
+        },
+        svg: {
+          fontCache: 'global'
+        },
+        chtml: {
+          scale: 1,
+          minScale: 0.5,
+          displayAlign: 'center',
+          displayIndent: '0'
+        }
+      };
+    </script>
+    
+    <!-- Chargement de MathJax -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    
+    <script type="importmap">
+    {
+      "imports": {
+        "@/": "./",
+        "react/": "https://esm.sh/react@^19.1.1/",
+        "react": "https://esm.sh/react@^19.1.1",
+        "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
+        "@google/genai": "https://esm.sh/@google/genai@^1.13.0",
+        "better-react-mathjax": "https://esm.sh/better-react-mathjax@^2.3.0",
+        "react-router-dom": "https://esm.sh/react-router-dom@^6.24.1",
+        "react-dropzone": "https://esm.sh/react-dropzone@^14.3.8",
+        "lucide-react": "https://esm.sh/lucide-react@^0.417.0"
+      }
+    }
+    </script>
+    <link rel="stylesheet" href="/index.css">
 </head>
 <body class="bg-gray-100 dark:bg-gray-950 text-gray-800 dark:text-gray-200 font-sans antialiased">
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>

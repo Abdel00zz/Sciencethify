@@ -19,18 +19,48 @@ const MathRenderer: React.FC<MathRendererProps> = ({ content, className }) => {
   }
   
   const [isTypesetting, setIsTypesetting] = useState(true);
+  const [isMathJaxReady, setIsMathJaxReady] = useState(false);
 
   useEffect(() => {
-    // Fallback : force MathJax to typeset when content changes (utile en production)
-    if (typeof window !== 'undefined' && (window as any).MathJax?.typesetPromise) {
-      (window as any).MathJax.typesetPromise()
-        .then(() => setIsTypesetting(false))
-        .catch(() => setIsTypesetting(false));
+    // Vérifier si MathJax est déjà prêt
+    if ((window as any).MathJaxReady) {
+      setIsMathJaxReady(true);
+      return;
     }
-  }, [content]);
 
-  // This callback is likely firing correctly, but if the content is empty,
-  // nothing appears, which is the bug.
+    // Attendre que MathJax soit prêt
+    const checkMathJax = setInterval(() => {
+      if ((window as any).MathJax && (window as any).MathJax.startup) {
+        setIsMathJaxReady(true);
+        clearInterval(checkMathJax);
+      }
+    }, 100);
+
+    return () => clearInterval(checkMathJax);
+  }, []);
+
+  useEffect(() => {
+    if (!isMathJaxReady) return;
+
+    const MathJax = (window as any).MathJax;
+    if (!MathJax || !MathJax.typesetPromise) return;
+
+    // Retarder légèrement pour s'assurer que le DOM est prêt
+    const timer = setTimeout(() => {
+      setIsTypesetting(true);
+      MathJax.typesetPromise()
+        .then(() => {
+          setIsTypesetting(false);
+        })
+        .catch((err: any) => {
+          console.warn('MathJax typeset error:', err);
+          setIsTypesetting(false);
+        });
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [content, isMathJaxReady]);
+
   const onDone = useCallback(() => {
     setIsTypesetting(false);
   }, []);
