@@ -1,6 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React from 'react';
 import { MathJax } from 'better-react-mathjax';
-import Spinner from './Spinner';
 
 interface MathRendererProps {
   content: string;
@@ -9,84 +8,29 @@ interface MathRendererProps {
 
 /**
  * A robust component to render a string containing HTML and LaTeX.
- * It shows a loading spinner while MathJax is typesetting the content,
- * preventing any "flash of un-compiled content" and providing clear visual feedback.
+ * It leverages the `better-react-mathjax` library to handle typesetting.
  */
 const MathRenderer: React.FC<MathRendererProps> = ({ content, className }) => {
-  // If content is empty or just whitespace, return null
+  // If content is empty or just whitespace, return null to avoid rendering empty containers.
   if (!content || content.trim() === '') {
     return null;
   }
-  
-  const [isTypesetting, setIsTypesetting] = useState(true);
-  const [isMathJaxReady, setIsMathJaxReady] = useState(false);
-
-  useEffect(() => {
-    // Vérifier si MathJax est déjà prêt
-    if ((window as any).MathJaxReady) {
-      setIsMathJaxReady(true);
-      return;
-    }
-
-    // Attendre que MathJax soit prêt
-    const checkMathJax = setInterval(() => {
-      if ((window as any).MathJax && (window as any).MathJax.startup) {
-        setIsMathJaxReady(true);
-        clearInterval(checkMathJax);
-      }
-    }, 100);
-
-    return () => clearInterval(checkMathJax);
-  }, []);
-
-  useEffect(() => {
-    if (!isMathJaxReady) return;
-
-    const MathJax = (window as any).MathJax;
-    if (!MathJax || !MathJax.typesetPromise) return;
-
-    // Retarder légèrement pour s'assurer que le DOM est prêt
-    const timer = setTimeout(() => {
-      setIsTypesetting(true);
-      MathJax.typesetPromise()
-        .then(() => {
-          setIsTypesetting(false);
-        })
-        .catch((err: any) => {
-          console.warn('MathJax typeset error:', err);
-          setIsTypesetting(false);
-        });
-    }, 50);
-
-    return () => clearTimeout(timer);
-  }, [content, isMathJaxReady]);
-
-  const onDone = useCallback(() => {
-    setIsTypesetting(false);
-  }, []);
 
   return (
-    <div className={`${className || ''} relative`}>
-      {isTypesetting && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/30 dark:bg-slate-900/30 backdrop-blur-sm z-10 rounded-lg min-h-[4rem]">
-          <Spinner size="sm" />
-        </div>
-      )}
-      {/*
-        - `key={content}` forces a re-mount and re-typeset when content changes.
-        - `onLoad` should fire when the new instance is ready.
-        - We use opacity for a smooth fade-in transition.
+    <div className={`${className || ''} math-renderer-container`}>
+      {/* 
+        The `key` prop is crucial. It forces React to re-mount the MathJax component
+        when the content string changes. This ensures that MathJax re-processes the new
+        content instead of reusing the old, already-typeset DOM.
       */}
-      <MathJax
-        key={content}
-        onTypeset={onDone}
-        style={{ opacity: isTypesetting ? 0 : 1, transition: 'opacity 0.2s ease-in' }}
-      >
+      <MathJax key={content}>
         <div 
           dangerouslySetInnerHTML={{ __html: content }} 
           className="modern-lists math-content"
         />
       </MathJax>
+      
+      {/* The component-specific styles are defined here using styled-jsx */}
       <style jsx>{`
         .math-content {
           font-size: calc(1em - 1.5px);
@@ -125,7 +69,7 @@ const MathRenderer: React.FC<MathRendererProps> = ({ content, className }) => {
           font-size: 0.75rem;
         }
         
-        /* Niveau 2 : a, b, c... */
+        /* Sub-level for a., b., c... */
         .modern-lists ol ol {
           counter-reset: level2;
           margin-top: 0.5em;
@@ -137,7 +81,8 @@ const MathRenderer: React.FC<MathRendererProps> = ({ content, className }) => {
           margin-left: 0;
         }
         .modern-lists ol ol > li::before {
-          content: counter(level2, lower-alpha);
+          /* Use 'lower-alpha' for a, b, c... and append a dot */
+          content: counter(level2, lower-alpha) ".";
           background-color: #f0f9ff;
           color: #0284c7;
           width: 1.8em;
@@ -147,37 +92,12 @@ const MathRenderer: React.FC<MathRendererProps> = ({ content, className }) => {
           top: 0.1em;
         }
         
-        /* Niveau 3 : i, ii, iii... */
-        .modern-lists ol ol ol {
-          counter-reset: level3;
-          padding-left: 0;
-        }
-        .modern-lists ol ol ol > li {
-          counter-increment: level3;
-          padding-left: 2.2em;
-          margin-left: 0;
-        }
-        .modern-lists ol ol ol > li::before {
-          content: counter(level3, lower-roman);
-          background-color: #f0f9ff;
-          color: #0284c7;
-          font-size: 0.75rem;
-          width: 1.8em;
-          height: 1.8em;
-          line-height: 1.8em;
-          top: 0.1em;
-        }
-
         /* Dark mode styles */
         :global(.dark) .modern-lists li::before {
             background-color: #3730a3;
             color: #e0e7ff;
         }
         :global(.dark) .modern-lists ol ol > li::before {
-            background-color: #075985;
-            color: #f0f9ff;
-        }
-        :global(.dark) .modern-lists ol ol ol > li::before {
             background-color: #075985;
             color: #f0f9ff;
         }
